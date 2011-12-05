@@ -3,7 +3,7 @@ Remove files with suffix
 
 Nautilus script to remove files ended with a given suffix.
 
-You need to install [Zenity][1] to run this script.''
+You need to install [Zenity][1] to run this script.
 
 *Copyright (C) 2011 Germán A. Racca - <gracca@gmail.com>*
 
@@ -19,7 +19,7 @@ How to install/uninstall with Makefile
 How to install/uninstall manually
 ---------------------------------
 
-Copy this script to nautilus scripts directory:
+Copy this script to Nautilus scripts directory:
 
 	$ cp remove-files-with-suffix ~/.gnome2/nautilus-scripts/
 
