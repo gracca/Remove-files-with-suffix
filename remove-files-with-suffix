@@ -1,0 +1,116 @@
+#!/bin/bash
+
+#-----------------------------------------------------------------------#
+# Nautilus script to remove files ended with a given suffix             #
+# You need to install Zenity to run this script                         #
+#                                                                       #
+# Copyright (C) 2011 Germán A. Racca - gracca[AT]gmail[DOT]com          #
+#                                                                       #
+# This program is free software: you can redistribute it and/or modify  #
+# it under the terms of the GNU General Public License as published by  #
+# the Free Software Foundation, either version 3 of the License, or     #
+# (at your option) any later version.                                   #
+#                                                                       #
+# This program is distributed in the hope that it will be useful,       #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          #
+# GNU General Public License for more details.                          #
+#                                                                       #
+# You should have received a copy of the GNU General Public License     #
+# along with this program. If not, see <http://www.gnu.org/licenses/>.  #
+#-----------------------------------------------------------------------#
+
+# Define version of script
+VERSION=0.1
+
+# Define some variables
+## guess correct paths
+ZNTY=$(which zenity)
+RMV=$(which rm)
+## remove new line in Nautilus env variables
+URI=$(echo $NAUTILUS_SCRIPT_CURRENT_URI | sed 's/\\n//g' | sed "s|file://||g")
+
+#--------------------------------------------#
+# Function to test if we are inside Nautilus #
+#--------------------------------------------#
+function test_nautilus() {
+
+	if [ -z $URI ]; then
+		echo -e "\nThis script must be run inside Nautilus!\n\n\tBye :-)\n"
+		exit 2
+	else
+		return 0
+	fi
+
+}
+
+#----------------------------------------------------#
+# Function to read the suffix of files to be removed #
+#----------------------------------------------------#
+function read_suffix() {
+
+	SFFX=$($ZNTY --entry \
+	--title="Remove files with suffix - $VERSION" \
+	--text="Enter suffix of files to be removed:")
+
+	[[ $? == 1 ]] && exit 1 || return 0
+
+}
+
+#-------------------------------------------------#
+# Function to list the actual files to be removed #
+#-------------------------------------------------#
+function list_files() {
+
+	LST=$(ls $URI/*.$SFFX)
+
+	if [ -z $LST ]; then
+		$ZNTY --error --no-wrap \
+		--text="There are no files with suffix \'$SFFX\'."
+		exit 1
+	else
+		FILES=$($ZNTY --question --no-wrap \
+		--text="Files to be removed:\n\n$LST\n\nAre you sure\?")
+	fi
+
+}
+
+#-----------------------------------------------#
+# Function to remove the file with given suffix #
+#-----------------------------------------------#
+function remove_files() {
+
+	case $? in
+		0)
+			$RMV -f $LST
+			$ZNTY --info \
+			--text="All files with suffix \'$SFFX\' REMOVED\!"
+			exit 0
+			;;
+		1)
+			$ZNTY --info \
+			--text="Files with suffix \'$SFFX\' NOT REMOVED\!"
+			exit 1
+			;;
+		*)
+			$ZNTY --warning --no-wrap \
+			--text="Something went wrong\!"
+			exit 2
+			;;
+	esac
+
+}
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#++  Run the functions to remove files with given suffix ++#
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
+test_nautilus
+
+read_suffix
+
+list_files
+
+remove_files
+
