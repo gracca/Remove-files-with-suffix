@@ -1,5 +1,5 @@
 #
-# Makefile to install a nautilus script:
+# Makefile to install a Nautilus script:
 #
 #	remove-files-with-suffix
 #
